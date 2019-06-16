@@ -1,6 +1,9 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const passport = require('passport')
+
+const Email = require('./models/Email')
 
 /***/
 
@@ -26,6 +29,29 @@ app.use(
     extended: false
   })
 )
+
+app.post('/seed/', (req, res) => {
+  const emails = [
+    new Email({
+      email: 'luismlorca@gmail.com'
+    }),
+    new Email({
+      email: 'llorca@truenorthcorporation.com'
+    })
+  ]
+  Email.deleteMany(null, err => {
+    if (err) console.log(err)
+  })
+  Email.insertMany(emails, (err, emails) => {
+    if (err) console.log(err)
+    else res.status(200).json(emails)
+  })
+})
+
+app.use(passport.initialize())
+require('./config/passport')
+
+app.use('/api/users/', require('./routes/users-route'))
 
 /***/
 
